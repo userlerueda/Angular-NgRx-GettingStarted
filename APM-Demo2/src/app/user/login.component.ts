@@ -12,20 +12,24 @@ import * as UserActions from './state/user.actions';
 
 @Component({
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+  styleUrls: ['./login.component.css'],
 })
 export class LoginComponent implements OnInit {
   pageTitle = 'Log In';
 
   maskUserName: boolean;
 
-  constructor(private store: Store<State>, private authService: AuthService, private router: Router) { }
+  constructor(
+    private store: Store<State>,
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     // TODO: Unsubscribe
-    this.store.select(getMaskUserName).subscribe(
-      maskUserName => this.maskUserName = maskUserName
-    );
+    this.store
+      .select(getMaskUserName)
+      .subscribe((maskUserName) => (this.maskUserName = maskUserName));
   }
 
   cancel(): void {
