@@ -5,7 +5,7 @@ import {
   createSelector,
 } from '@ngrx/store';
 import * as AppState from '../../state/app.state';
-import * as ProductActions from './product.actions'
+import * as ProductActions from './product.actions';
 import { Product } from '../product';
 
 export interface State extends AppState.State {
@@ -15,12 +15,14 @@ export interface ProductState {
   showProductCode: boolean;
   currentProduct: Product;
   products: Product[];
+  error: string;
 }
 
 const initialState: ProductState = {
   showProductCode: true,
   currentProduct: null,
   products: [],
+  error: ''
 };
 
 const getProductFeatureState = createFeatureSelector<ProductState>('products');
@@ -32,12 +34,18 @@ export const getShowProductCode = createSelector(
 
 export const getCurrentProduct = createSelector(
   getProductFeatureState,
-  state => state.currentProduct)
+  (state) => state.currentProduct
+);
 
 export const getProducts = createSelector(
   getProductFeatureState,
   (state) => state.products
 );
+
+export const getError = createSelector(
+  getProductFeatureState,
+  state => state.error
+)
 
 export const productReducer = createReducer<ProductState>(
   initialState,
@@ -50,28 +58,54 @@ export const productReducer = createReducer<ProductState>(
       };
     }
   ),
-  on(ProductActions.setCurrentProduct, (state, action): ProductState => {
-    return {
-      ...state,
-      currentProduct: action.product
+  on(
+    ProductActions.setCurrentProduct,
+    (state, action): ProductState => {
+      return {
+        ...state,
+        currentProduct: action.product,
+      };
     }
-  }),
-  on(ProductActions.clearCurrentProduct, (state): ProductState => {
-    return {
-      ...state,
-      currentProduct: null
+  ),
+  on(
+    ProductActions.clearCurrentProduct,
+    (state): ProductState => {
+      return {
+        ...state,
+        currentProduct: null,
+      };
     }
-  }),
-  on(ProductActions.initCurrentProduct, (state): ProductState => {
+  ),
+  on(
+    ProductActions.initCurrentProduct,
+    (state): ProductState => {
+      return {
+        ...state,
+        currentProduct: {
+          id: 0,
+          productName: '',
+          productCode: 'New',
+          description: '',
+          starRating: 0,
+        },
+      };
+    }
+  ),
+  on(
+    ProductActions.loadProductsSuccess,
+    (state, action): ProductState => {
+      return {
+        ...state,
+        products: action.products,
+        error: ''
+      };
+    }
+  ),
+  on(ProductActions.loadProductsFailure, (state, action): ProductState => {
     return {
       ...state,
-      currentProduct: {
-        id: 0,
-        productName: '',
-        productCode: 'New',
-        description: '',
-        starRating: 0
-      }
+      products: [],
+      error: action.error
     }
   })
 );
